@@ -6,7 +6,9 @@ function leapYear(year) {
 }
 
 async function fileDetails(val) {
-    return (await fileType.fromBuffer(val.getBufferData())) || { ext: val.getExtension(), mime: val.getMimetype() }
+    let buf = typeof val.getBufferData === 'function' ? val.getBufferData() : val.buffer;
+    let detected = fileType(buf);
+    return detected || { ext: typeof val.getExtension === 'function' ? val.getExtension() : null, mime: typeof val.getMimetype === 'function' ? val.getMimetype() : null };
 }
 
 function isFile(obj = {}) {
@@ -455,10 +457,13 @@ var rules = {
             if (mimetypes.includes(filetype.mime)) {
                 return true
             }
-            if (mimetypes.includes('*')) {
-                let fileMime = filetype.mime.split('/')
-                if (fileMime[0] == mimetypes[i].split('/')[0]) {
-                    return true
+            for (let i = 0; i < mimetypes.length; i++) {
+                if (mimetypes[i].endsWith('/*')) {
+                    let typePrefix = mimetypes[i].split('/')[0];
+                    let filePrefix = filetype.mime.split('/')[0];
+                    if (typePrefix === filePrefix) {
+                        return true;
+                    }
                 }
             }
             return false
@@ -507,7 +512,11 @@ Rule.prototype = {
             };
 
             if (this.async) {
-                return this._apply(inputValue, ruleValue, attribute, handleResponse);
+                var res = this._apply(inputValue, ruleValue, attribute, handleResponse);
+                if (res && typeof res.then === 'function') {
+                    return res.then(handleResponse, function() { handleResponse(false); });
+                }
+                return res;
             } else {
                 return handleResponse(this._apply(inputValue, ruleValue, attribute));
             }
@@ -595,7 +604,7 @@ Rule.prototype = {
 
 var manager = {
 
-    asyncRules: [],
+    asyncRules: ['exists', 'not_exists', 'mimes', 'mimetypes'],
 
     implicitRules: ['required', 'required_if', 'required_unless', 'required_with', 'required_with_all', 'required_without', 'required_without_all', 'accepted', 'present'],
 
