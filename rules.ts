@@ -1,20 +1,41 @@
 var fileType = require('file-type');
 const File = require('@ostro/contracts/container/file')
 const Database = require('@ostro/support/facades/database')
+/**
+ * leapYear handler.
+ * @param {*} year
+ * @returns {any}
+ */
 function leapYear(year) {
     return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
 }
 
+/**
+ * fileDetails handler.
+ * @param {*} val
+ * @async
+ * @returns {any}
+ */
 async function fileDetails(val) {
     let buf = typeof val.getBufferData === 'function' ? val.getBufferData() : val.buffer;
     let detected = fileType(buf);
     return detected || { ext: typeof val.getExtension === 'function' ? val.getExtension() : null, mime: typeof val.getMimetype === 'function' ? val.getMimetype() : null };
 }
 
+/**
+ * isFile handler.
+ * @param {*} obj
+ * @returns {any}
+ */
 function isFile(obj = {}) {
     return (obj instanceof File)
 }
 
+/**
+ * isValidDate handler.
+ * @param {*} inDate
+ * @returns {any}
+ */
 function isValidDate(inDate) {
     var valid = true;
 
@@ -477,6 +498,11 @@ var rules = {
         return typeof val == 'object' && !Array.isArray(val)
     },
 
+    /**
+     * json_string method.
+     * @param {*} val
+     * @returns {any}
+     */
     json_string(val) {
         try {
             JSON.parse(val)
@@ -492,6 +518,13 @@ var missedRuleValidator = function () {
 };
 var missedRuleMessage;
 
+/**
+ * Rule handler.
+ * @param {*} name
+ * @param {*} fn
+ * @param {*} async
+ * @returns {any}
+ */
 function Rule(name, fn, async) {
     this.name = name;
     this.fn = fn;
@@ -597,6 +630,10 @@ Rule.prototype = {
         return typeof this.fn !== 'function';
     },
 
+    /**
+     * Get customMessage.
+     * @returns {any}
+     */
     get customMessage() {
         return this.isMissed() ? missedRuleMessage : this._customMessage;
     }

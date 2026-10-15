@@ -103,6 +103,11 @@ var replacements = {
     },
 };
 
+/**
+ * formatter handler.
+ * @param {*} attribute
+ * @returns {any}
+ */
 function formatter(attribute) {
     return attribute.replace(/[_\[]/g, ' ').replace(/]/g, '');
 }

@@ -1,5 +1,11 @@
 const ValidationExceptionContract = require('@ostro/contracts/validation/validationException')
+/**
+ * Class ValidationException.
+ */
 class ValidationException extends ValidationExceptionContract {
+    /**
+     * Create a new instance.
+     */
     constructor() {
         super()
         this.name = this.constructor.name;
@@ -8,6 +14,12 @@ class ValidationException extends ValidationExceptionContract {
         this.status = 422;
         Error.captureStackTrace(this, this.constructor);
     }
+    /**
+     * add method.
+     * @param {*} attribute
+     * @param {*} message
+     * @returns {any}
+     */
     add(attribute, message) {
         if (!this.has(attribute)) {
             this.errors[attribute] = [];
@@ -18,10 +30,19 @@ class ValidationException extends ValidationExceptionContract {
         }
     }
 
+    /**
+     * getMessage method.
+     * @returns {any}
+     */
     getMessage() {
         return this.message
     }
 
+    /**
+     * get method.
+     * @param {*} attribute
+     * @returns {any}
+     */
     get(attribute) {
         if (this.has(attribute)) {
             return this.errors[attribute];
@@ -30,9 +51,18 @@ class ValidationException extends ValidationExceptionContract {
         return [];
     }
 
+    /**
+     * getErrors method.
+     * @returns {any}
+     */
     getErrors() {
         return this.errors
     }
+    /**
+     * first method.
+     * @param {*} attribute
+     * @returns {any}
+     */
     first(attribute) {
         if (this.has(attribute)) {
             return this.errors[attribute][0];
@@ -41,10 +71,19 @@ class ValidationException extends ValidationExceptionContract {
         return false;
     }
 
+    /**
+     * all method.
+     * @returns {any}
+     */
     all() {
         return this.errors;
     }
 
+    /**
+     * has method.
+     * @param {*} attribute
+     * @returns {any}
+     */
     has(attribute) {
         if (this.errors.hasOwnProperty(attribute)) {
             return true;

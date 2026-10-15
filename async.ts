@@ -1,3 +1,9 @@
+/**
+ * AsyncResolvers handler.
+ * @param {*} onFailedOne
+ * @param {*} onResolvedAll
+ * @returns {any}
+ */
 function AsyncResolvers(onFailedOne, onResolvedAll) {
     this.onResolvedAll = onResolvedAll;
     this.onFailedOne = onFailedOne;

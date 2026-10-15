@@ -127,6 +127,12 @@ Validator.prototype = {
     _flattenObject: function (obj) {
         var flattened = {};
 
+        /**
+         * recurse handler.
+         * @param {*} current
+         * @param {*} property
+         * @returns {any}
+         */
         function recurse(current, property) {
             if (!property && Object.getOwnPropertyNames(current).length === 0) {
                 return;
