@@ -503,7 +503,7 @@ var rules = {
      * @param {*} val
      * @returns {any}
      */
-    json_string(val) {
+    json_string(val: any) {
         try {
             JSON.parse(val)
             return true

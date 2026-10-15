@@ -20,7 +20,7 @@ class ValidationException extends ValidationExceptionContract {
      * @param {*} message
      * @returns {any}
      */
-    add(attribute, message) {
+    add(attribute: string, message: string) {
         if (!this.has(attribute)) {
             this.errors[attribute] = [];
         }
@@ -43,7 +43,7 @@ class ValidationException extends ValidationExceptionContract {
      * @param {*} attribute
      * @returns {any}
      */
-    get(attribute) {
+    get(attribute: string) {
         if (this.has(attribute)) {
             return this.errors[attribute];
         }
@@ -63,7 +63,7 @@ class ValidationException extends ValidationExceptionContract {
      * @param {*} attribute
      * @returns {any}
      */
-    first(attribute) {
+    first(attribute: string) {
         if (this.has(attribute)) {
             return this.errors[attribute][0];
         }
@@ -84,7 +84,7 @@ class ValidationException extends ValidationExceptionContract {
      * @param {*} attribute
      * @returns {any}
      */
-    has(attribute) {
+    has(attribute: string) {
         if (this.errors.hasOwnProperty(attribute)) {
             return true;
         }

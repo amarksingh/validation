@@ -11,7 +11,7 @@ class ValidationManager extends Macroable {
      * Create a new instance.
      * @param {*} app
      */
-    constructor(app) {
+    constructor(app: any) {
         super()
         Object.defineProperty(this, kApp, {
             value: app,
@@ -25,7 +25,7 @@ class ValidationManager extends Macroable {
      * @param {*} messages
      * @returns {any}
      */
-    make(inputs, schema, messages = {}) {
+    make(inputs: any, schema: any, messages: Record<string, any> = {}) {
         return Promise.resolve(new validation(inputs, schema, messages))
     }
     /**
@@ -35,7 +35,7 @@ class ValidationManager extends Macroable {
      * @param {*} messages
      * @returns {any}
      */
-    validate(inputs, schema, messages = {}) {
+    validate(inputs: any, schema: any, messages: Record<string, any> = {}) {
         return this.make(inputs, schema, messages).then(async validation => {
             if (await validation.fails()) {
                 return Promise.reject(validation.errors())
@@ -52,7 +52,7 @@ class ValidationManager extends Macroable {
      * @param {*} message
      * @returns {any}
      */
-    static extend(name, cb, message) {
+    static extend(name: string, cb: any, message: string) {
         validation.register(name, cb, message)
     }
     /**
@@ -63,7 +63,7 @@ class ValidationManager extends Macroable {
      * @param {*} message
      * @returns {any}
      */
-    static extendAsync(name, cb, message) {
+    static extendAsync(name: string, cb: any, message: string) {
         validation.registerAsync(name, cb, message)
     }
     /**
@@ -73,7 +73,7 @@ class ValidationManager extends Macroable {
      * @param {*} message
      * @returns {any}
      */
-    extend(name, cb, message) {
+    extend(name: string, cb: any, message: string) {
         validation.register(name, cb, message)
     }
     /**
@@ -83,7 +83,7 @@ class ValidationManager extends Macroable {
      * @param {*} message
      * @returns {any}
      */
-    extendAsync(name, cb, message) {
+    extendAsync(name: string, cb: any, message: string) {
         validation.registerAsync(name, cb, message)
     }
 
@@ -95,7 +95,7 @@ class ValidationManager extends Macroable {
      * @param {*} args
      * @returns {any}
      */
-    static __call(target, method, args) {
+    static __call(target: Record<string, any>, method: string, args: any[]) {
         return validation[method](...args);
     }
     /**
@@ -105,7 +105,7 @@ class ValidationManager extends Macroable {
      * @param {*} args
      * @returns {any}
      */
-    __call(target, method, args) {
+    __call(target: Record<string, any>, method: string, args: any[]) {
         return validation[method](...args);
     }
 }
