@@ -2,7 +2,7 @@
   "name": "@ostro/validation",
   "version": "1.1.0",
   "description": "Validation module for OstroJS",
-  "main": "validationManager.js",
+  "main": "validationManager.ts",
   "scripts": {
     "test": "npx c8 npx jest"
   },

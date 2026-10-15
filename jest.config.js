@@ -7,7 +7,7 @@ module.exports = {
         "**/test/**/*.test.js"
     ],
     "collectCoverageFrom": [
-        "<rootDir>/**/*.js",
+        "<rootDir>/**/*.ts",
         "!<rootDir>/node_modules/**",
         "!<rootDir>/coverage/**",
         "!<rootDir>/jest.config.js",
