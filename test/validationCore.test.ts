@@ -1,6 +1,7 @@
-const Validator = require('../validation');
-const File = require('@ostro/contracts/container/file');
-const Database = require('@ostro/support/facades/database');
+import Validator from '../validation';
+import File from '@ostro/contracts/container/file';
+import Database = require('@ostro/support/facades/database');
+import Rules from '../rules';
 
 describe('Validation Core & Rules', () => {
     afterEach(() => {
@@ -498,7 +499,6 @@ describe('Validation Core & Rules', () => {
     });
 
     test('Rule class missing rule execution and parameters handling', () => {
-        const Rules = require('../rules');
         const v = new Validator({}, {});
         const rule = Rules.make('non_existent_rule_xyz', v);
         expect(() => rule.validate('val', 'req', 'attr')).toThrow('Validator `non_existent_rule_xyz` is not defined!');
@@ -532,7 +532,6 @@ describe('Validation Core & Rules', () => {
     });
 
     test('date validation rules with dots, invalid components, and all comparison branches', async () => {
-        const Rules = require('../rules');
         const v = new Validator({
             d_dot: '2025.05.12',
             d_bad_yr: '0500-01-01',
@@ -673,7 +672,6 @@ describe('Validation Core & Rules', () => {
     });
 
     test('mimes and mimetypes wildcard and error handling', async () => {
-        const Rules = require('../rules');
         const v = new Validator({}, {});
         const mimesRule = Rules.make('mimes', v);
         // val without buffer / causing exception in fileDetails
@@ -757,7 +755,6 @@ describe('Validation Core & Rules', () => {
     });
 
     test('mimetypes wildcard prefix match and prefix mismatch', async () => {
-        const Rules = require('../rules');
         const v = new Validator({}, {});
         const rule = Rules.make('mimetypes', v);
 
@@ -786,7 +783,6 @@ describe('Validation Core & Rules', () => {
     });
 
     test('async rule returning non-thenable object in validate callback', (done) => {
-        const Rules = require('../rules');
         const v = new Validator({}, {});
         Rules.registerAsync('sync_returns_val', function (val, req, attr, cb) {
             cb(true);

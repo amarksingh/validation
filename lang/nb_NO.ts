@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':attribute må være akseptert.',
   alpha: ':attribute feltet kan kun inneholde alfabetiske tegn.',
   alpha_dash: ':attribute feltet kan kun inneholde alfanumeriske tegn, i tillegg til bindestreker og understreker.',

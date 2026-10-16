@@ -1,26 +1,33 @@
-const ValidationExceptionContract = require('@ostro/contracts/validation/validationException')
+import ValidationExceptionContract = require('@ostro/contracts/validation/validationException');
+
 /**
  * Class ValidationException.
  */
 class ValidationException extends ValidationExceptionContract {
+    public name: string;
+    public message: string;
+    public errors: Record<string, string[]>;
+    public status: number;
+
     /**
      * Create a new instance.
      */
     constructor() {
-        super()
+        super();
         this.name = this.constructor.name;
         this.message = 'Given data was invalid';
         this.errors = {};
         this.status = 422;
         Error.captureStackTrace(this, this.constructor);
     }
+
     /**
-     * add method.
-     * @param {*} attribute
-     * @param {*} message
-     * @returns {any}
+     * Add error message for an attribute.
+     *
+     * @param attribute - The attribute name
+     * @param message - The error message
      */
-    add(attribute: string, message: string) {
+    public add(attribute: string, message: string): void {
         if (!this.has(attribute)) {
             this.errors[attribute] = [];
         }
@@ -31,19 +38,21 @@ class ValidationException extends ValidationExceptionContract {
     }
 
     /**
-     * getMessage method.
-     * @returns {any}
+     * Get the error message.
+     *
+     * @returns The main validation error message
      */
-    getMessage() {
-        return this.message
+    public getMessage(): string {
+        return this.message;
     }
 
     /**
-     * get method.
-     * @param {*} attribute
-     * @returns {any}
+     * Get all messages for an attribute.
+     *
+     * @param attribute - The attribute name
+     * @returns Array of error messages
      */
-    get(attribute: string) {
+    public get(attribute: string): string[] {
         if (this.has(attribute)) {
             return this.errors[attribute];
         }
@@ -52,18 +61,21 @@ class ValidationException extends ValidationExceptionContract {
     }
 
     /**
-     * getErrors method.
-     * @returns {any}
+     * Get all errors.
+     *
+     * @returns Record of attribute error arrays
      */
-    getErrors() {
-        return this.errors
+    public getErrors(): Record<string, string[]> {
+        return this.errors;
     }
+
     /**
-     * first method.
-     * @param {*} attribute
-     * @returns {any}
+     * Get the first error message for an attribute.
+     *
+     * @param attribute - The attribute name
+     * @returns The first error message or false if none
      */
-    first(attribute: string) {
+    public first(attribute: string): string | false {
         if (this.has(attribute)) {
             return this.errors[attribute][0];
         }
@@ -72,24 +84,23 @@ class ValidationException extends ValidationExceptionContract {
     }
 
     /**
-     * all method.
-     * @returns {any}
+     * Get all error messages.
+     *
+     * @returns Record of attribute error arrays
      */
-    all() {
+    public all(): Record<string, string[]> {
         return this.errors;
     }
 
     /**
-     * has method.
-     * @param {*} attribute
-     * @returns {any}
+     * Check if an attribute has errors.
+     *
+     * @param attribute - The attribute name
+     * @returns Whether the attribute has errors
      */
-    has(attribute: string) {
-        if (this.errors.hasOwnProperty(attribute)) {
-            return true;
-        }
-
-        return false;
+    public has(attribute: string): boolean {
+        return Object.prototype.hasOwnProperty.call(this.errors, attribute);
     }
 }
-module.exports = ValidationException
+
+export = ValidationException;

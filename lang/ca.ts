@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: 'El camp :attribute pot ser aceptat.',
   after: 'El camp :attribute pot ser una data posterior a :after.',
   alpha: 'El camp :attribute només pot contenir lletras.',

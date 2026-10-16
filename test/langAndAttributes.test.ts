@@ -1,6 +1,6 @@
-const Lang = require('../lang');
-const Messages = require('../messages');
-const Attributes = require('../attributes');
+import Lang = require('../lang');
+import Messages = require('../messages');
+import Attributes = require('../attributes');
 
 describe('Lang, Messages & Attributes', () => {
     describe('Lang', () => {

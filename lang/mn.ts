@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':Attribute баталсан байх шаардлагатай.',
   active_url: ':Attribute талбарт зөв URL хаяг оруулна уу.',
   after: ':Attribute талбарт :date-с хойш огноо оруулна уу.',

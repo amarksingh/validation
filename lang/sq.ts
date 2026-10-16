@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':attribute duhet të pranohet.',
   active_url: ':attribute nuk është adresë e saktë.',
   after: ':attribute duhet të jetë datë pas :date.',

@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: 'Il campo :attribute deve essere accettato.',
   alpha: 'Il campo :attribute deve contenere sono caratteri alfabetici.',
   alpha_dash: 'Il campo :attribute può contenere solo caratteri alfanumerici oltre a trattini e trattini bassi.',

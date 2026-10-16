@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: 'O campo :attribute deve ser aceito.',
   active_url: 'O campo :attribute deve conter uma URL válida.',
   after: 'O campo :attribute deve conter uma data posterior a :date.',
@@ -97,6 +97,5 @@ module.exports = {
   timezone: 'O campo :attribute deve conter um fuso horário válido.',
   unique: 'O valor informado para o campo :attribute já está em uso.',
   uploaded: 'Falha no Upload do arquivo :attribute.',
-  url: 'O formato da URL informada para o campo :attribute é inválido.',
   url: 'O formato da URL informada para o campo :attribute é inválido.',
 };

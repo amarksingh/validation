@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: 'الصفة :attribute يجب أن تكون مقبولة',
   after: 'الصفة :attribute يجب أن تكون بعد الصفة :after.',
   after_or_equal: 'الصفة :attribute يجب أن تكون مساوية أو بعد الصفة :after_or_equal.',

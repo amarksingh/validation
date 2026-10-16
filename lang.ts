@@ -1,18 +1,38 @@
-var Messages = require('./messages');
+import Messages = require('./messages');
+import './lang/en';
 
-require('./lang/en');
+const requireMethod: NodeRequire = require;
 
-var require_method = require;
+interface LangContainer {
+    messages: Record<string, any>;
+    _set(lang: string, rawMessages: Record<string, any>): void;
+    _setRuleMessage(lang: string, attribute: string, message?: string): void;
+    _load(lang: string): void;
+    _get(lang: string): Record<string, any>;
+    _make(lang: string): Messages;
+}
 
-var container = {
-
+const container: LangContainer = {
     messages: {},
 
-    _set: function(lang, rawMessages) {
+    /**
+     * Store raw messages for a language.
+     *
+     * @param lang - The language code
+     * @param rawMessages - The raw message dictionary
+     */
+    _set(lang: string, rawMessages: Record<string, any>): void {
         this.messages[lang] = rawMessages;
     },
 
-    _setRuleMessage: function(lang, attribute, message) {
+    /**
+     * Set a custom message for a rule in a language.
+     *
+     * @param lang - The language code
+     * @param attribute - The rule/attribute identifier
+     * @param message - The message string or fallback to default
+     */
+    _setRuleMessage(lang: string, attribute: string, message?: string): void {
         this._load(lang);
         if (message === undefined) {
             message = this.messages[lang].def;
@@ -21,25 +41,41 @@ var container = {
         this.messages[lang][attribute] = message;
     },
 
-    _load: function(lang) {
+    /**
+     * Load language messages dynamically if not already loaded.
+     *
+     * @param lang - The language code
+     */
+    _load(lang: string): void {
         if (!this.messages[lang]) {
             try {
-                var rawMessages = require_method('./lang/' + lang);
+                const rawMessages = requireMethod('./lang/' + lang);
                 this._set(lang, rawMessages);
             } catch (e) {}
         }
     },
 
-    _get: function(lang) {
+    /**
+     * Get the raw message dictionary for a language.
+     *
+     * @param lang - The language code
+     * @returns The raw messages object
+     */
+    _get(lang: string): Record<string, any> {
         this._load(lang);
         return this.messages[lang];
     },
 
-    _make: function(lang) {
+    /**
+     * Create a new Messages instance for a language.
+     *
+     * @param lang - The language code
+     * @returns A new Messages instance
+     */
+    _make(lang: string): Messages {
         this._load(lang);
         return new Messages(lang, this.messages[lang]);
     }
-
 };
 
-module.exports = container;
+export = container;

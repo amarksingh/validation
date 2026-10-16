@@ -1,113 +1,121 @@
-const validation = require('./validation')
-const {
-    Macroable
-} = require('@ostro/support/macro')
-const kApp = Symbol('app')
+import Validation = require('./validation');
+import { Macroable } from '@ostro/support/macro';
+
+const kApp: unique symbol = Symbol('app');
+
 /**
  * Class ValidationManager.
  */
 class ValidationManager extends Macroable {
     /**
      * Create a new instance.
-     * @param {*} app
+     *
+     * @param app - The application container instance
      */
     constructor(app: any) {
-        super()
+        super();
         Object.defineProperty(this, kApp, {
             value: app,
-        })
+        });
+    }
 
-    }
     /**
-     * make method.
-     * @param {*} inputs
-     * @param {*} schema
-     * @param {*} messages
-     * @returns {any}
+     * Create a new Validator instance.
+     *
+     * @param inputs - The inputs to validate
+     * @param schema - The validation rules schema
+     * @param messages - Custom error messages
+     * @returns Promise resolving to a Validator instance
      */
-    make(inputs: any, schema: any, messages: Record<string, any> = {}) {
-        return Promise.resolve(new validation(inputs, schema, messages))
+    public make(inputs: any, schema: any, messages: Record<string, any> = {}): Promise<Validation> {
+        return Promise.resolve(new Validation(inputs, schema, messages));
     }
+
     /**
-     * validate method.
-     * @param {*} inputs
-     * @param {*} schema
-     * @param {*} messages
-     * @returns {any}
+     * Validate the given inputs against rules.
+     *
+     * @param inputs - The inputs to validate
+     * @param schema - The validation rules schema
+     * @param messages - Custom error messages
+     * @returns Promise resolving to true or rejecting with errors
      */
-    validate(inputs: any, schema: any, messages: Record<string, any> = {}) {
-        return this.make(inputs, schema, messages).then(async validation => {
-            if (await validation.fails()) {
-                return Promise.reject(validation.errors())
+    public validate(inputs: any, schema: any, messages: Record<string, any> = {}): Promise<boolean> {
+        return this.make(inputs, schema, messages).then(async (validator: Validation) => {
+            if (await validator.fails()) {
+                return Promise.reject(validator.errors());
             } else {
-                return Promise.resolve(true)
+                return Promise.resolve(true);
             }
-        })
-    }
-    /**
-     * extend method.
-     * @static
-     * @param {*} name
-     * @param {*} cb
-     * @param {*} message
-     * @returns {any}
-     */
-    static extend(name: string, cb: any, message: string) {
-        validation.register(name, cb, message)
-    }
-    /**
-     * extendAsync method.
-     * @static
-     * @param {*} name
-     * @param {*} cb
-     * @param {*} message
-     * @returns {any}
-     */
-    static extendAsync(name: string, cb: any, message: string) {
-        validation.registerAsync(name, cb, message)
-    }
-    /**
-     * extend method.
-     * @param {*} name
-     * @param {*} cb
-     * @param {*} message
-     * @returns {any}
-     */
-    extend(name: string, cb: any, message: string) {
-        validation.register(name, cb, message)
-    }
-    /**
-     * extendAsync method.
-     * @param {*} name
-     * @param {*} cb
-     * @param {*} message
-     * @returns {any}
-     */
-    extendAsync(name: string, cb: any, message: string) {
-        validation.registerAsync(name, cb, message)
+        });
     }
 
     /**
-     * __call method.
-     * @static
-     * @param {*} target
-     * @param {*} method
-     * @param {*} args
-     * @returns {any}
+     * Register a custom validation rule statically.
+     *
+     * @param name - The rule name
+     * @param cb - The rule validator function
+     * @param message - The default error message
      */
-    static __call(target: Record<string, any>, method: string, args: any[]) {
-        return validation[method](...args);
+    public static extend(name: string, cb: any, message?: string): void {
+        Validation.register(name, cb, message);
     }
+
     /**
-     * __call method.
-     * @param {*} target
-     * @param {*} method
-     * @param {*} args
-     * @returns {any}
+     * Register an asynchronous custom validation rule statically.
+     *
+     * @param name - The rule name
+     * @param cb - The async rule validator function
+     * @param message - The default error message
      */
-    __call(target: Record<string, any>, method: string, args: any[]) {
-        return validation[method](...args);
+    public static extendAsync(name: string, cb: any, message?: string): void {
+        Validation.registerAsync(name, cb, message);
+    }
+
+    /**
+     * Register a custom validation rule.
+     *
+     * @param name - The rule name
+     * @param cb - The rule validator function
+     * @param message - The default error message
+     */
+    public extend(name: string, cb: any, message?: string): void {
+        Validation.register(name, cb, message);
+    }
+
+    /**
+     * Register an asynchronous custom validation rule.
+     *
+     * @param name - The rule name
+     * @param cb - The async rule validator function
+     * @param message - The default error message
+     */
+    public extendAsync(name: string, cb: any, message?: string): void {
+        Validation.registerAsync(name, cb, message);
+    }
+
+    /**
+     * Macroable static call proxy.
+     *
+     * @param target - The target object
+     * @param method - The method name
+     * @param args - The arguments array
+     * @returns The method result from Validation
+     */
+    public static __call(target: any, method: string, args: any[]): any {
+        return (Validation as any)[method](...args);
+    }
+
+    /**
+     * Macroable instance call proxy.
+     *
+     * @param target - The target object
+     * @param method - The method name
+     * @param args - The arguments array
+     * @returns The method result from Validation
+     */
+    public __call(target: any, method: string, args: any[]): any {
+        return (Validation as any)[method](...args);
     }
 }
 
-module.exports = ValidationManager
+export = ValidationManager;

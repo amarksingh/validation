@@ -1,57 +1,80 @@
-require('@ostro/support/helpers')
-var Rules = require('./rules');
-var Lang = require('./lang');
-var Attributes = require('./attributes');
-var AsyncResolvers = require('./async');
-var validationException = require('./validationException');
-var Validator = function (input, rules, customMessages) {
-    var lang = Validator.getDefaultLang();
-    this.input = input || {};
+import '@ostro/support/helpers';
+import Rules = require('./rules');
+import Lang = require('./lang');
+import Attributes = require('./attributes');
+import AsyncResolvers = require('./async');
+import ValidationException = require('./validationException');
 
-    this.messages = Lang._make(lang);
-    this.messages._setCustom(customMessages);
-    this.setAttributeFormatter(Validator.prototype.attributeFormatter);
+/**
+ * Class Validator.
+ */
+class Validator {
+    declare public lang: string;
+    declare public numericRules: string[];
+    declare public attributeFormatter: (attribute: string) => string;
+    declare public stopOnAttributes: any;
 
-    this.errorBag = new validationException();
-    this.errorCount = 0;
+    public input: Record<string, any>;
+    public messages: any;
+    public errorBag: ValidationException;
+    public errorCount: number;
+    public hasAsync: boolean;
+    public rules: Record<string, any[]>;
 
-    this.hasAsync = false;
-    this.rules = this._parseRules(rules);
-};
+    /**
+     * Create a new Validator instance.
+     *
+     * @param input - The inputs to validate
+     * @param rules - The validation rules
+     * @param customMessages - Custom error messages map
+     */
+    constructor(input?: any, rules?: any, customMessages?: Record<string, any>) {
+        const lang = Validator.getDefaultLang();
+        this.input = input || {};
 
-Validator.prototype = {
+        this.messages = Lang._make(lang);
+        this.messages._setCustom(customMessages);
+        this.setAttributeFormatter(Validator.prototype.attributeFormatter);
 
-    constructor: Validator,
+        this.errorBag = new ValidationException();
+        this.errorCount = 0;
 
-    lang: 'en',
+        this.hasAsync = false;
+        this.rules = this._parseRules(rules);
+    }
 
-    numericRules: ['integer', 'numeric'],
+    /**
+     * Get the error bag containing all validation errors.
+     *
+     * @returns The ValidationException instance
+     */
+    public errors(): ValidationException {
+        return this.errorBag;
+    }
 
-    attributeFormatter: Attributes.formatter,
-
-    errors: function () {
-        return this.errorBag
-    },
-    check: async function () {
-        var self = this;
-
-        for (var attribute in this.rules) {
-            var attributeRules = this.rules[attribute];
-            var inputValue = this._objectPath(this.input, attribute);
+    /**
+     * Run all synchronous and asynchronous validation rules.
+     *
+     * @returns Promise resolving to whether validation passed
+     */
+    public async check(): Promise<boolean> {
+        for (const attribute in this.rules) {
+            const attributeRules = this.rules[attribute];
+            const inputValue = this._objectPath(this.input, attribute);
 
             if (this._hasRule(attribute, ['sometimes']) && !this._suppliedWithData(attribute)) {
                 continue;
             }
 
-            for (var i = 0, len = attributeRules.length, rule, ruleOptions, rulePassed; i < len; i++) {
-                ruleOptions = attributeRules[i];
-                rule = this.getRule(ruleOptions.name);
+            for (let i = 0, len = attributeRules.length; i < len; i++) {
+                const ruleOptions = attributeRules[i];
+                const rule = this.getRule(ruleOptions.name);
 
                 if (!this._isValidatable(rule, inputValue)) {
                     continue;
                 }
 
-                rulePassed = await rule.validate(inputValue, ruleOptions.value, attribute);
+                const rulePassed = await rule.validate(inputValue, ruleOptions.value, attribute);
                 if (!rulePassed) {
                     this._addFailure(rule);
                 }
@@ -63,48 +86,52 @@ Validator.prototype = {
         }
 
         return this.errorCount === 0;
-    },
+    }
 
-    checkAsync: function (passes, fails) {
-        var _this = this;
-        passes = passes || function () { };
-        fails = fails || function () { };
+    /**
+     * Run validation asynchronously with completion callbacks.
+     *
+     * @param passes - Callback when all rules pass
+     * @param fails - Callback when any rule fails
+     */
+    public checkAsync(passes?: () => void, fails?: () => void): void {
+        const passesCb = passes || function () {};
+        const failsCb = fails || function () {};
 
-        var failsOne = function (rule, message) {
-            _this._addFailure(rule, message);
+        const failsOne = (rule: any, message?: string) => {
+            this._addFailure(rule, message);
         };
 
-        var resolvedAll = function (allPassed) {
+        const resolvedAll = (allPassed: boolean) => {
             if (allPassed) {
-                passes();
+                passesCb();
             } else {
-                fails();
+                failsCb();
             }
         };
 
-        var asyncResolvers = new AsyncResolvers(failsOne, resolvedAll);
+        const asyncResolvers = new AsyncResolvers(failsOne, resolvedAll);
 
-        var validateRule = function (inputValue, ruleOptions, attribute, rule) {
-            return function () {
-                var resolverIndex = asyncResolvers.add(rule);
-                rule.validate(inputValue, ruleOptions.value, attribute, function () {
+        const validateRule = (inputValue: any, ruleOptions: any, attribute: string, rule: any) => {
+            return () => {
+                const resolverIndex = asyncResolvers.add(rule);
+                rule.validate(inputValue, ruleOptions.value, attribute, () => {
                     asyncResolvers.resolve(resolverIndex);
                 });
             };
         };
 
-        for (var attribute in this.rules) {
-            var attributeRules = this.rules[attribute];
-            var inputValue = this._objectPath(this.input, attribute);
+        for (const attribute in this.rules) {
+            const attributeRules = this.rules[attribute];
+            const inputValue = this._objectPath(this.input, attribute);
 
             if (this._hasRule(attribute, ['sometimes']) && !this._suppliedWithData(attribute)) {
                 continue;
             }
 
-            for (var i = 0, len = attributeRules.length, rule, ruleOptions; i < len; i++) {
-                ruleOptions = attributeRules[i];
-
-                rule = this.getRule(ruleOptions.name);
+            for (let i = 0, len = attributeRules.length; i < len; i++) {
+                const ruleOptions = attributeRules[i];
+                const rule = this.getRule(ruleOptions.name);
 
                 if (!this._isValidatable(rule, inputValue)) {
                     continue;
@@ -116,37 +143,43 @@ Validator.prototype = {
 
         asyncResolvers.enableFiring();
         asyncResolvers.fire();
-    },
+    }
 
-    _addFailure: function (rule) {
-        var msg = this.messages.render(rule);
+    /**
+     * Add a validation failure for a rule.
+     *
+     * @param rule - The rule that failed
+     * @param message - Optional custom failure message
+     */
+    public _addFailure(rule: any, message?: string): void {
+        const msg = this.messages.render(rule);
         this.errorBag.add(rule.attribute, msg);
         this.errorCount++;
-    },
+    }
 
-    _flattenObject: function (obj) {
-        var flattened = {};
+    /**
+     * Flatten nested object keys into dot notation.
+     *
+     * @param obj - The object to flatten
+     * @returns The flattened object
+     */
+    public _flattenObject(obj: any): Record<string, any> {
+        const flattened: Record<string, any> = {};
 
-        /**
-         * recurse handler.
-         * @param {*} current
-         * @param {*} property
-         * @returns {any}
-         */
-        function recurse(current, property) {
+        function recurse(current: any, property?: string): void {
             if (!property && Object.getOwnPropertyNames(current).length === 0) {
                 return;
             }
             if (Object(current) !== current || Array.isArray(current)) {
-                flattened[property] = current;
+                flattened[property!] = current;
             } else {
-                var isEmpty = true;
-                for (var p in current) {
+                let isEmpty = true;
+                for (const p in current) {
                     isEmpty = false;
-                    recurse(current[p], property ? property + "." + p : p);
+                    recurse(current[p], property ? property + '.' + p : p);
                 }
                 if (isEmpty) {
-                    flattened[property] = {};
+                    flattened[property!] = {};
                 }
             }
         }
@@ -154,22 +187,29 @@ Validator.prototype = {
             recurse(obj);
         }
         return flattened;
-    },
+    }
 
-    _objectPath: function (obj, path) {
+    /**
+     * Get value from nested object using dot or bracket path.
+     *
+     * @param obj - The object
+     * @param path - The path string
+     * @returns The resolved value
+     */
+    public _objectPath(obj: any, path: string): any {
         if (Object.prototype.hasOwnProperty.call(obj, path)) {
             return obj[path];
         }
 
-        var keys = path.replace(/\[(\w+)\]/g, ".$1").replace(/^\./, "").split(".");
-        var copy = {};
-        for (var attr in obj) {
+        const keys = path.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, '').split('.');
+        let copy: any = {};
+        for (const attr in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, attr)) {
                 copy[attr] = obj[attr];
             }
         }
 
-        for (var i = 0, l = keys.length; i < l; i++) {
+        for (let i = 0, l = keys.length; i < l; i++) {
             if (Object.hasOwnProperty.call(copy, keys[i])) {
                 copy = copy[keys[i]];
             } else {
@@ -177,46 +217,72 @@ Validator.prototype = {
             }
         }
         return copy;
-    },
+    }
 
-    _parseRules: function (rules) {
-
-        var parsedRules = {};
+    /**
+     * Parse raw rules object into normalized structure.
+     *
+     * @param rules - Raw rules mapping
+     * @returns Parsed rules mapping
+     */
+    public _parseRules(rules: any): Record<string, any[]> {
+        const parsedRules: Record<string, any[]> = {};
         rules = this._flattenObject(rules);
 
-        for (var attribute in rules) {
-
-            var rulesArray = rules[attribute];
-
+        for (const attribute in rules) {
+            const rulesArray = rules[attribute];
             this._parseRulesCheck(attribute, rulesArray, parsedRules);
         }
         return parsedRules;
+    }
 
-    },
-
-    _parseRulesCheck: function (attribute, rulesArray, parsedRules, wildCardValues) {
+    /**
+     * Route parsing check for wildcard vs default rules.
+     *
+     * @param attribute - The attribute name
+     * @param rulesArray - The rules array or string
+     * @param parsedRules - The parsed rules accumulator
+     * @param wildCardValues - Array of wildcard indices
+     */
+    public _parseRulesCheck(attribute: string, rulesArray: any, parsedRules: Record<string, any[]>, wildCardValues?: any[]): void {
         if (attribute.indexOf('*') > -1) {
             this._parsedRulesRecurse(attribute, rulesArray, parsedRules, wildCardValues);
         } else {
             this._parseRulesDefault(attribute, rulesArray, parsedRules, wildCardValues);
         }
-    },
+    }
 
-    _parsedRulesRecurse: function (attribute, rulesArray, parsedRules, wildCardValues) {
-        var parentPath = attribute.substr(0, attribute.indexOf('*') - 1);
-        var propertyValue = this._objectPath(this.input, parentPath);
+    /**
+     * Recursively expand wildcard rules over input array lengths.
+     *
+     * @param attribute - Wildcard attribute pattern
+     * @param rulesArray - Rules array
+     * @param parsedRules - The parsed rules accumulator
+     * @param wildCardValues - Wildcard indices array
+     */
+    public _parsedRulesRecurse(attribute: string, rulesArray: any, parsedRules: Record<string, any[]>, wildCardValues?: any[]): void {
+        const parentPath = attribute.substr(0, attribute.indexOf('*') - 1);
+        const propertyValue = this._objectPath(this.input, parentPath);
 
         if (propertyValue) {
-            for (var propertyNumber = 0; propertyNumber < propertyValue.length; propertyNumber++) {
-                var workingValues = wildCardValues ? wildCardValues.slice() : [];
+            for (let propertyNumber = 0; propertyNumber < propertyValue.length; propertyNumber++) {
+                const workingValues = wildCardValues ? wildCardValues.slice() : [];
                 workingValues.push(propertyNumber);
-                this._parseRulesCheck(attribute.replace('*', propertyNumber), rulesArray, parsedRules, workingValues);
+                this._parseRulesCheck(attribute.replace('*', String(propertyNumber)), rulesArray, parsedRules, workingValues);
             }
         }
-    },
+    }
 
-    _parseRulesDefault: function (attribute, rulesArray, parsedRules, wildCardValues) {
-        var attributeRules = [];
+    /**
+     * Parse default (non-wildcard) rules list.
+     *
+     * @param attribute - Attribute name
+     * @param rulesArray - Rules array or pipe-separated string
+     * @param parsedRules - Target accumulator
+     * @param wildCardValues - Wildcard indices array
+     */
+    public _parseRulesDefault(attribute: string, rulesArray: any, parsedRules: Record<string, any[]>, wildCardValues?: any[]): void {
+        const attributeRules: any[] = [];
 
         if (rulesArray instanceof Array) {
             rulesArray = this._prepareRulesArray(rulesArray);
@@ -226,8 +292,8 @@ Validator.prototype = {
             rulesArray = rulesArray.split('|');
         }
 
-        for (var i = 0, len = rulesArray.length, rule; i < len; i++) {
-            rule = typeof rulesArray[i] === 'string' ? this._extractRuleAndRuleValue(rulesArray[i]) : rulesArray[i];
+        for (let i = 0, len = rulesArray.length; i < len; i++) {
+            const rule = typeof rulesArray[i] === 'string' ? this._extractRuleAndRuleValue(rulesArray[i]) : rulesArray[i];
             if (rule.value) {
                 rule.value = this._replaceWildCards(rule.value, wildCardValues);
                 this._replaceWildCardsMessages(wildCardValues);
@@ -240,20 +306,26 @@ Validator.prototype = {
         }
 
         parsedRules[attribute] = attributeRules;
-    },
+    }
 
-    _replaceWildCards: function (path, nums) {
-
+    /**
+     * Replace wildcards in rule parameters.
+     *
+     * @param path - Rule parameter path or array
+     * @param nums - Wildcard indices array
+     * @returns Path with wildcards replaced
+     */
+    public _replaceWildCards(path: any, nums?: any[]): any {
         if (!nums) {
             return path;
         }
 
-        var path2 = path;
-        nums.forEach(function (value) {
+        let path2 = path;
+        nums.forEach(function (value: any) {
             if (Array.isArray(path2)) {
                 path2 = path2[0];
             }
-            pos = path2.indexOf('*');
+            const pos = path2.indexOf('*');
             if (pos === -1) {
                 return path2;
             }
@@ -264,27 +336,38 @@ Validator.prototype = {
             path2 = path;
         }
         return path2;
-    },
+    }
 
-    _replaceWildCardsMessages: function (nums) {
-        var customMessages = this.messages.customMessages;
-        var self = this;
-        Object.keys(customMessages).forEach(function (key) {
+    /**
+     * Replace wildcards in custom error message keys.
+     *
+     * @param nums - Wildcard indices array
+     */
+    public _replaceWildCardsMessages(nums?: any[]): void {
+        const customMessages = this.messages.customMessages;
+        const self = this;
+        Object.keys(customMessages).forEach(function (key: string) {
             if (nums) {
-                var newKey = self._replaceWildCards(key, nums);
+                const newKey = self._replaceWildCards(key, nums);
                 customMessages[newKey] = customMessages[key];
             }
         });
 
         this.messages._setCustom(customMessages);
-    },
+    }
 
-    _prepareRulesArray: function (rulesArray) {
-        var rules = [];
+    /**
+     * Prepare rules array by unpacking object key-value rules.
+     *
+     * @param rulesArray - Array of rule definitions
+     * @returns Normalized rules array
+     */
+    public _prepareRulesArray(rulesArray: any[]): any[] {
+        const rules: any[] = [];
 
-        for (var i = 0, len = rulesArray.length; i < len; i++) {
+        for (let i = 0, len = rulesArray.length; i < len; i++) {
             if (typeof rulesArray[i] === 'object') {
-                for (var rule in rulesArray[i]) {
+                for (const rule in rulesArray[i]) {
                     rules.push({
                         name: rule,
                         value: rulesArray[i][rule]
@@ -296,52 +379,89 @@ Validator.prototype = {
         }
 
         return rules;
-    },
+    }
 
-    _suppliedWithData: function (attribute) {
-        return this.input.hasOwnProperty(attribute);
-    },
+    /**
+     * Check if the input contains a value for the attribute.
+     *
+     * @param attribute - The attribute name
+     * @returns Whether the attribute is present in input
+     */
+    public _suppliedWithData(attribute: string): boolean {
+        return Object.prototype.hasOwnProperty.call(this.input, attribute);
+    }
 
-    _extractRuleAndRuleValue: function (ruleString) {
-        var rule = {},
-            ruleArray;
-
-        rule.name = ruleString;
+    /**
+     * Extract rule name and optional value from a string (e.g. "min:3").
+     *
+     * @param ruleString - The rule string
+     * @returns Object with name and optional value
+     */
+    public _extractRuleAndRuleValue(ruleString: string): { name: string; value?: string } {
+        const rule: { name: string; value?: string } = {
+            name: ruleString
+        };
 
         if (ruleString.indexOf(':') >= 0) {
-            ruleArray = ruleString.split(':');
+            const ruleArray = ruleString.split(':');
             rule.name = ruleArray[0];
-            rule.value = ruleArray.slice(1).join(":");
+            rule.value = ruleArray.slice(1).join(':');
         }
 
         return rule;
-    },
+    }
 
-    _hasRule: function (attribute, findRules) {
-        var rules = this.rules[attribute] || [];
-        for (var i = 0, len = rules.length; i < len; i++) {
+    /**
+     * Determine if an attribute has any of the specified rules.
+     *
+     * @param attribute - The attribute name
+     * @param findRules - Array of rule names to search for
+     * @returns Whether any matching rule was found
+     */
+    public _hasRule(attribute: string, findRules: string[]): boolean {
+        const rules = this.rules[attribute] || [];
+        for (let i = 0, len = rules.length; i < len; i++) {
             if (findRules.indexOf(rules[i].name) > -1) {
                 return true;
             }
         }
         return false;
-    },
+    }
 
-    _hasNumericRule: function (attribute) {
+    /**
+     * Check if an attribute is constrained by numeric rules.
+     *
+     * @param attribute - The attribute name
+     * @returns Whether a numeric rule is present
+     */
+    public _hasNumericRule(attribute: string): boolean {
         return this._hasRule(attribute, this.numericRules);
-    },
+    }
 
-    _isValidatable: function (rule, value) {
+    /**
+     * Determine if an attribute should be validated under a rule.
+     *
+     * @param rule - The rule instance
+     * @param value - The input value
+     * @returns Whether validation should proceed
+     */
+    public _isValidatable(rule: any, value: any): boolean {
         if (Rules.isImplicit(rule.name)) {
             return true;
         }
 
         return this.getRule('required').validate(value);
-    },
+    }
 
-    _shouldStopValidating: function (attribute, rulePassed) {
-
-        var stopOnAttributes = this.stopOnAttributes;
+    /**
+     * Determine whether validation should halt on first error.
+     *
+     * @param attribute - The attribute name
+     * @param rulePassed - Whether current rule passed
+     * @returns Whether validation should stop
+     */
+    public _shouldStopValidating(attribute: string, rulePassed: boolean): boolean {
+        const stopOnAttributes = this.stopOnAttributes;
         if (typeof stopOnAttributes === 'undefined' || stopOnAttributes === false || rulePassed === true) {
             return false;
         }
@@ -351,42 +471,82 @@ Validator.prototype = {
         }
 
         return true;
-    },
+    }
 
-    setAttributeNames: function (attributes) {
+    /**
+     * Set custom attribute names for error messages.
+     *
+     * @param attributes - Map of attribute names to custom labels
+     */
+    public setAttributeNames(attributes: Record<string, string>): void {
         this.messages._setAttributeNames(attributes);
-    },
+    }
 
-    setAttributeFormatter: function (func) {
+    /**
+     * Set attribute formatter function.
+     *
+     * @param func - Formatter function
+     */
+    public setAttributeFormatter(func: (attribute: string) => string): void {
         this.messages._setAttributeFormatter(func);
-    },
+    }
 
-    getRule: function (name) {
+    /**
+     * Retrieve a Rule instance by name.
+     *
+     * @param name - The rule name
+     * @returns A Rule instance
+     */
+    public getRule(name: string): any {
         return Rules.make(name, this);
-    },
+    }
 
-    stopOnError: function (attributes) {
+    /**
+     * Configure attributes to stop validation on error.
+     *
+     * @param attributes - Array of attribute names, or boolean
+     */
+    public stopOnError(attributes: any): void {
         this.stopOnAttributes = attributes;
-    },
+    }
 
-    passes: function (passes) {
-        var async = this._checkAsync('passes', passes);
+    /**
+     * Run validation and check if it passes.
+     *
+     * @param passes - Optional callback for async validation
+     * @returns Result or Promise of passes
+     */
+    public passes(passes?: () => void): any {
+        const async = this._checkAsync('passes', passes);
         if (async) {
             return this.checkAsync(passes);
         }
         return this.check();
-    },
+    }
 
-    fails: async function (fails) {
-        var async = this._checkAsync('fails', fails);
+    /**
+     * Run validation and check if it fails.
+     *
+     * @param fails - Optional callback for async validation
+     * @returns Result or Promise of fails
+     */
+    public async fails(fails?: () => void): Promise<any> {
+        const async = this._checkAsync('fails', fails);
         if (async) {
-            return this.checkAsync(function () { }, fails);
+            return this.checkAsync(function () {}, fails);
         }
-        return !await this.check();
-    },
+        return !(await this.check());
+    }
 
-    _checkAsync: function (funcName, callback) {
-        var hasCallback = typeof callback === 'function';
+    /**
+     * Check if async callbacks are required and validate configuration.
+     *
+     * @param funcName - Calling method name
+     * @param callback - Optional callback
+     * @returns Whether async validation is enabled
+     */
+    public _checkAsync(funcName: string, callback?: Function): boolean {
+        const hasCallback = typeof callback === 'function';
         if (this.hasAsync && !hasCallback) {
             throw funcName + ' expects a callback when async rules are being tested.';
         }
@@ -394,59 +554,129 @@ Validator.prototype = {
         return this.hasAsync || hasCallback;
     }
 
-};
+    /**
+     * Set message dictionary for a language.
+     *
+     * @param lang - Language code
+     * @param messages - Messages dictionary
+     * @returns The Validator class
+     */
+    public static setMessages(lang: string, messages: Record<string, any>): typeof Validator {
+        Lang._set(lang, messages);
+        return this;
+    }
 
-Validator.setMessages = function (lang, messages) {
-    Lang._set(lang, messages);
-    return this;
-};
+    /**
+     * Get messages for a language.
+     *
+     * @param lang - Language code
+     * @returns Messages dictionary
+     */
+    public static getMessages(lang: string): Record<string, any> {
+        return Lang._get(lang);
+    }
 
-Validator.getMessages = function (lang) {
-    return Lang._get(lang);
-};
+    /**
+     * Set the active language for validation messages.
+     *
+     * @param lang - Language code
+     */
+    public static useLang(lang: string): void {
+        this.prototype.lang = lang;
+    }
 
-Validator.useLang = function (lang) {
-    this.prototype.lang = lang;
-};
+    /**
+     * Get the default language code.
+     *
+     * @returns Default language code
+     */
+    public static getDefaultLang(): string {
+        return this.prototype.lang;
+    }
 
-Validator.getDefaultLang = function () {
-    return this.prototype.lang;
-};
+    /**
+     * Set attribute formatter function globally.
+     *
+     * @param func - Formatter function
+     */
+    public static setAttributeFormatter(func: (attribute: string) => string): void {
+        this.prototype.attributeFormatter = func;
+    }
 
-Validator.setAttributeFormatter = function (func) {
-    this.prototype.attributeFormatter = func;
-};
+    /**
+     * Set global stopOnError attributes.
+     *
+     * @param attributes - Array of attributes or boolean
+     */
+    public static stopOnError(attributes: any): void {
+        this.prototype.stopOnAttributes = attributes;
+    }
 
-Validator.stopOnError = function (attributes) {
-    this.prototype.stopOnAttributes = attributes;
-};
+    /**
+     * Register a new validation rule globally.
+     *
+     * @param name - Rule name
+     * @param fn - Rule validator function
+     * @param message - Optional error message
+     */
+    public static register(name: string, fn: any, message?: string): void {
+        const lang = Validator.getDefaultLang();
+        Rules.register(name, fn);
+        Lang._setRuleMessage(lang, name, message);
+    }
 
-Validator.register = function (name, fn, message) {
-    var lang = Validator.getDefaultLang();
-    Rules.register(name, fn);
-    Lang._setRuleMessage(lang, name, message);
-};
+    /**
+     * Register a new implicit validation rule globally.
+     *
+     * @param name - Rule name
+     * @param fn - Rule validator function
+     * @param message - Optional error message
+     */
+    public static registerImplicit(name: string, fn: any, message?: string): void {
+        const lang = Validator.getDefaultLang();
+        Rules.registerImplicit(name, fn);
+        Lang._setRuleMessage(lang, name, message);
+    }
 
-Validator.registerImplicit = function (name, fn, message) {
-    var lang = Validator.getDefaultLang();
-    Rules.registerImplicit(name, fn);
-    Lang._setRuleMessage(lang, name, message);
-};
+    /**
+     * Register a new asynchronous validation rule globally.
+     *
+     * @param name - Rule name
+     * @param fn - Async rule validator function
+     * @param message - Optional error message
+     */
+    public static registerAsync(name: string, fn: any, message?: string): void {
+        const lang = Validator.getDefaultLang();
+        Rules.registerAsync(name, fn);
+        Lang._setRuleMessage(lang, name, message);
+    }
 
-Validator.registerAsync = function (name, fn, message) {
-    var lang = Validator.getDefaultLang();
-    Rules.registerAsync(name, fn);
-    Lang._setRuleMessage(lang, name, message);
-};
+    /**
+     * Register a new asynchronous implicit validation rule globally.
+     *
+     * @param name - Rule name
+     * @param fn - Async implicit rule validator function
+     * @param message - Optional error message
+     */
+    public static registerAsyncImplicit(name: string, fn: any, message?: string): void {
+        const lang = Validator.getDefaultLang();
+        Rules.registerAsyncImplicit(name, fn);
+        Lang._setRuleMessage(lang, name, message);
+    }
 
-Validator.registerAsyncImplicit = function (name, fn, message) {
-    var lang = Validator.getDefaultLang();
-    Rules.registerAsyncImplicit(name, fn);
-    Lang._setRuleMessage(lang, name, message);
-};
+    /**
+     * Register a fallback handler for undefined rules.
+     *
+     * @param fn - Fallback validator function
+     * @param message - Optional error message
+     */
+    public static registerMissedRuleValidator(fn: any, message?: string): void {
+        Rules.registerMissedRuleValidator(fn, message);
+    }
+}
 
-Validator.registerMissedRuleValidator = function (fn, message) {
-    Rules.registerMissedRuleValidator(fn, message);
-};
+Validator.prototype.lang = 'en';
+Validator.prototype.numericRules = ['integer', 'numeric'];
+Validator.prototype.attributeFormatter = Attributes.formatter;
 
-module.exports = Validator;
+export = Validator;

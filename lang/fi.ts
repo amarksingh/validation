@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':attribute on oltava hyväksytty.',
   after: ':attribute on oltava :after jälkeen.',
   after_or_equal: ':attribute täytyy olla sama kuin :after_or_equal tai sen jälkeen.',

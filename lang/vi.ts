@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':attribute phải được chấp nhận.',
   alpha: 'Trường :attribute phải là ký tự',
   alpha_dash: ':attribute chỉ chấp nhận ký tự chữ cái, số, dấu gạch chéo và gạch dưới.',

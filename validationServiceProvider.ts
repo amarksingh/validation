@@ -1,23 +1,23 @@
-const ServiceProvider = require('@ostro/support/serviceProvider');
-const Validation = require('./validationManager');
+import ServiceProvider = require('@ostro/support/serviceProvider');
+import Validation = require('./validationManager');
+
 /**
  * Class validationServiceProvider.
  */
 class validationServiceProvider extends ServiceProvider {
     /**
-     * register method.
-     * @returns {any}
+     * Register validation service provider in the container.
      */
-    register() {
-        this.$app.singleton('validation', function(app) {
-            return new Validation(app)
-        })
+    public register(): void {
+        this.$app.singleton('validation', function(app: any) {
+            return new Validation(app);
+        });
     }
-    /**
-     * boot method.
-     * @returns {any}
-     */
-    boot() {}
 
+    /**
+     * Boot the service provider.
+     */
+    public boot(): void {}
 }
-module.exports = validationServiceProvider
+
+export = validationServiceProvider;

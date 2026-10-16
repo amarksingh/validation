@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':attribute kabul edilmeli.',
   alpha: ':attribute alanı sadece harflerden oluşabilir.',
   alpha_dash: ':attribute alanı sadece alfa-nümerik, tire ve alt çizgi karakterlerden oluşabilir.',

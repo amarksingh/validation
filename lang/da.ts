@@ -1,4 +1,4 @@
-module.exports = {
+export = {
   accepted: ':attribute skal accepteres.',
   after: ':attribute skal være en dato efter :after.',
   after_or_equal: ':attribute skal være en dato efter eller lig med :after_or_equal.',
