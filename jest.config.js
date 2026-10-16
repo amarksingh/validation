@@ -10,8 +10,13 @@ module.exports = {
         "<rootDir>/**/*.ts",
         "!<rootDir>/node_modules/**",
         "!<rootDir>/coverage/**",
+        "!<rootDir>/build/**",
         "!<rootDir>/jest.config.js",
         "!<rootDir>/test/**"
+    ],
+    "testPathIgnorePatterns": [
+        "/node_modules/",
+        "/build/"
     ],
     "coverageDirectory": "coverage",
     "coverageReporters": [

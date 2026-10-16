@@ -2,8 +2,24 @@
   "name": "@ostro/validation",
   "version": "1.1.0",
   "description": "Validation module for OstroJS",
-  "main": "validationManager.ts",
+  "main": "build/validationManager.js",
+  "types": "build/validationManager.d.ts",
+  "files": [
+    "build"
+  ],
+  "exports": {
+    ".": {
+      "types": "./build/validationManager.d.ts",
+      "default": "./build/validationManager.js"
+    },
+    "./*": {
+      "types": "./build/*.d.ts",
+      "default": "./build/*.js"
+    }
+  },
   "scripts": {
+    "build": "npx tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "test": "npx c8 npx jest"
   },
   "dependencies": {

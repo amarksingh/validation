@@ -644,7 +644,7 @@ class Rule {
             return value.length;
         }
         if (value instanceof File) {
-            return value.buffer.length / 1024;
+            return (value as any).buffer?.length ? (value as any).buffer.length / 1024 : 0;
         }
 
         if (typeof value === 'number') {
