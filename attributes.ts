@@ -115,7 +115,12 @@ function formatter(attribute: string): string {
     return attribute.replace(/[_\[]/g, ' ').replace(/]/g, '');
 }
 
-export = {
+export {
+    replacements,
+    formatter
+};
+
+export default {
     replacements,
     formatter
 };

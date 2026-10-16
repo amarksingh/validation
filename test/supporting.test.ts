@@ -1,8 +1,8 @@
-import ValidationException = require('../validationException');
-import Errors = require('../errors');
-import AsyncResolvers = require('../async');
-import ValidationServiceProvider = require('../validationServiceProvider');
-import ValidationManager = require('../validationManager');
+import ValidationException from '../validationException';
+import Errors from '../errors';
+import AsyncResolvers from '../async';
+import ValidationServiceProvider from '../validationServiceProvider';
+import ValidationManager from '../validationManager';
 
 describe('Validation Helpers & Supporting Classes', () => {
     describe('ValidationException', () => {

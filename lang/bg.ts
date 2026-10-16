@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'Трябва да приемете :attribute.',
   active_url: 'Полето :attribute не е валиден URL адрес.',
   after: 'Полето :attribute трябва да бъде дата след :date.',

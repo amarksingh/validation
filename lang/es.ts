@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'El campo :attribute debe ser aceptado.',
   after: 'El campo :attribute debe ser una fecha posterior a :after.',
   alpha: 'El campo :attribute solo debe contener letras.',

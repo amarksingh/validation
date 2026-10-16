@@ -89,4 +89,4 @@ class AsyncResolvers {
     }
 }
 
-export = AsyncResolvers;
+export default AsyncResolvers;

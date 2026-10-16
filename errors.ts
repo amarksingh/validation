@@ -75,4 +75,4 @@ class Errors {
     }
 }
 
-export = Errors;
+export default Errors;

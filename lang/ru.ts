@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'Вы должны принять :attribute.',
   alpha: 'Поле :attribute может содержать только буквы.',
   alpha_dash: 'Поле :attribute может содержать только буквы, цифры, дефисы и символы подчёркивания.',

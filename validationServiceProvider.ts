@@ -1,5 +1,5 @@
-import ServiceProvider = require('@ostro/support/serviceProvider');
-import Validation = require('./validationManager');
+import ServiceProvider from '@ostro/support/serviceProvider';
+import Validation from './validationManager';
 
 /**
  * Class validationServiceProvider.
@@ -20,4 +20,4 @@ class validationServiceProvider extends ServiceProvider {
     public boot(): void {}
 }
 
-export = validationServiceProvider;
+export default validationServiceProvider;

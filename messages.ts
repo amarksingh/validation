@@ -1,4 +1,4 @@
-import Attributes = require('./attributes');
+import Attributes from './attributes';
 
 /**
  * Class Messages.
@@ -149,4 +149,4 @@ class Messages {
     }
 }
 
-export = Messages;
+export default Messages;

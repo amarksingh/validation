@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'Pole :attribute musi być zaakceptowane.',
   alpha: 'Pole :attribute może zawierać tylko litery.',
   alpha_dash: 'Pole :attribute moze zawierać tylko litery, myślnik i podrkeślenie.',

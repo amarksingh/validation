@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: ':attributeを確認してください。',
   after: ':attributeは:afterより後の日付を入力してください。',
   after_or_equal: ':attributeは:after_or_equal以降の日付を入力してください。',

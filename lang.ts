@@ -1,4 +1,4 @@
-import Messages = require('./messages');
+import Messages from './messages';
 import './lang/en';
 
 const requireMethod: NodeRequire = require;
@@ -49,7 +49,8 @@ const container: LangContainer = {
     _load(lang: string): void {
         if (!this.messages[lang]) {
             try {
-                const rawMessages = requireMethod('./lang/' + lang);
+                const rawModule = requireMethod('./lang/' + lang);
+                const rawMessages = rawModule?.default || rawModule;
                 this._set(lang, rawMessages);
             } catch (e) {}
         }
@@ -78,4 +79,4 @@ const container: LangContainer = {
     }
 };
 
-export = container;
+export default container;

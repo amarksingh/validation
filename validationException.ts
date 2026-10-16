@@ -1,4 +1,4 @@
-import ValidationExceptionContract = require('@ostro/contracts/validation/validationException');
+import ValidationExceptionContract from '@ostro/contracts/validation/validationException';
 
 /**
  * Class ValidationException.
@@ -103,4 +103,4 @@ class ValidationException extends ValidationExceptionContract {
     }
 }
 
-export = ValidationException;
+export default ValidationException;

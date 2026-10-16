@@ -1,6 +1,6 @@
 import Validator from '../validation';
 import File from '@ostro/contracts/container/file';
-import Database = require('@ostro/support/facades/database');
+import Database from '@ostro/support/facades/database';
 import Rules from '../rules';
 
 describe('Validation Core & Rules', () => {

@@ -1,6 +1,6 @@
-import fileType = require('file-type');
-import File = require('@ostro/contracts/container/file');
-import Database = require('@ostro/support/facades/database');
+import fileType from 'file-type';
+import File from '@ostro/contracts/container/file';
+import Database from '@ostro/support/facades/database';
 
 /**
  * Determine if a year is a leap year.
@@ -826,4 +826,4 @@ const manager: RuleManager = {
     }
 };
 
-export = manager;
+export default manager;

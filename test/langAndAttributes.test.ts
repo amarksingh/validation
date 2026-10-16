@@ -1,6 +1,6 @@
-import Lang = require('../lang');
-import Messages = require('../messages');
-import Attributes = require('../attributes');
+import Lang from '../lang';
+import Messages from '../messages';
+import Attributes from '../attributes';
 
 describe('Lang, Messages & Attributes', () => {
     describe('Lang', () => {
@@ -20,6 +20,19 @@ describe('Lang, Messages & Attributes', () => {
 
             // non-existent lang loads safely with catch
             Lang._load('non_existent_lang_xyz');
+
+            const allLocales = [
+                'ar', 'az', 'be', 'bg', 'bs', 'ca', 'cs', 'cy', 'da', 'de',
+                'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'hr', 'hu',
+                'id', 'it', 'ja', 'ka', 'ko', 'lt', 'lv', 'mk', 'mn', 'ms',
+                'nb_NO', 'nl', 'pl', 'pt', 'pt_BR', 'ro', 'ru', 'sl', 'sq', 'sr',
+                'sv', 'tr', 'ua', 'uk', 'vi', 'zh', 'zh_TW'
+            ];
+            for (const loc of allLocales) {
+                const loaded = Lang._get(loc);
+                expect(loaded).toBeDefined();
+                expect(loaded.required).toBeDefined();
+            }
 
             const msgInstance = Lang._make('en');
             expect(msgInstance).toBeInstanceOf(Messages);

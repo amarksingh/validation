@@ -1,4 +1,4 @@
-import Validation = require('./validation');
+import Validation from './validation';
 import { Macroable } from '@ostro/support/macro';
 
 const kApp: unique symbol = Symbol('app');
@@ -118,4 +118,4 @@ class ValidationManager extends Macroable {
     }
 }
 
-export = ValidationManager;
+export default ValidationManager;

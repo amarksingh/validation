@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'Das :attribute Feld muss akzeptiert werden.',
   after: 'Das :attribute muss ein Datum nach dem :after sein.',
   after_or_equal: 'Das :attribute Datum muss kleiner oder gleich dem :after_or_equal sein.',

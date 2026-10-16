@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'Rhaid derbyn :attribute.',
   active_url: 'Nid yw :attribute yn URL dilys.',
   after: 'Rhaid i :attribute fod yn ddyddiad sydd ar ôl :date.',

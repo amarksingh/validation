@@ -1,9 +1,9 @@
 import '@ostro/support/helpers';
-import Rules = require('./rules');
-import Lang = require('./lang');
-import Attributes = require('./attributes');
-import AsyncResolvers = require('./async');
-import ValidationException = require('./validationException');
+import Rules from './rules';
+import Lang from './lang';
+import Attributes from './attributes';
+import AsyncResolvers from './async';
+import ValidationException from './validationException';
 
 /**
  * Class Validator.
@@ -679,4 +679,4 @@ Validator.prototype.lang = 'en';
 Validator.prototype.numericRules = ['integer', 'numeric'];
 Validator.prototype.attributeFormatter = Attributes.formatter;
 
-export = Validator;
+export default Validator;

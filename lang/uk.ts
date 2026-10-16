@@ -1,4 +1,4 @@
-export = {
+export default {
   accepted: 'Ви повинні прийняти :attribute.',
   active_url: 'Поле :attribute не є правильним URL.',
   after: 'Поле :attribute має містити дату не раніше :date.',
