@@ -1,7 +1,7 @@
 # @ostro/validation — Antigravity AI Architecture & Knowledge Base
 
 > **Package Name**: `@ostro/validation`
-> **Version**: `1.1.0`
+> **Version**: `2.0.0-alpha.1`
 > **Role in Ecosystem**: Modular Core Framework Library
 
 ---
